@@ -16,7 +16,7 @@ public class TestBinary {
     UnaryFunc<Double, Double> f = (x) -> (x * x);
     BinaryFunc<Double, Double, Double> fex = (x, y) -> x + y;
     BinaryFunc<Double, Double, Double> xPl = new XPlusY();
-    assertEquals("ree", new Double(10d), new Double(xPl.apply(7d, 3d)));
+    assertEquals("ree", new Double(10d), xPl.apply(7d, 3d));
     assertEquals("ree", new Double(49), f.apply(7d));
   }
 }
