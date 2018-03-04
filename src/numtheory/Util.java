@@ -2,6 +2,7 @@ package numtheory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -155,6 +156,65 @@ public class Util {
   }
 
   /**
+   * Returns whether a natural number is prime or not.
+   *
+   * @param number Number to test primality of
+   * @return True if the number is prime, false if not
+   * @throws IllegalArgumentException If given a negative number
+   * @throws IllegalStateException If the prime sieve is null/not big enough
+   */
+  public static boolean isPrime(int number) {
+    if(number < 0) {
+      throw new IllegalArgumentException("Given a negative number");
+    }
+
+    if(sieve == null || number >= sieve.length-1) {
+      throw new IllegalStateException("Need to generate a larger sieve first");
+    }
+
+    return sieve[number];
+  }
+
+
+  /**
+   * Calculates the radical of a number. When considering the prime factorization of a number,
+   * the radical is the number that results when all duplicate primes are removed.
+   * <p>Example: 3780 = 2*2*3*3*3*5*7, rad(3780) = 2*3*5*7 = 210.
+   *
+   * @param number Number to calculate the radical of
+   * @return Radical of the given number
+   */
+  public static int radical(int number) {
+    // muh java 8
+    return factorNoRepeats(number).stream().reduce(1, (x, y) -> x * y);
+  }
+
+  /**
+   * Calculates the Euler totient function of the given number. The totient function is defined as
+   * the count of relatively prime positive integers less than a number.
+   *
+   * @param number Number to calculate totient of
+   * @return phi(number)
+   */
+  public static int phi(int number) {
+    if(number == 1) {
+      return 1;
+    }
+
+    return factor(number).stream().reduce(1,
+            // Basically a fold operation, uses fact that phi(mn) = phi(m)phi(n) if GCD(m,n) = 1,
+            // and that phi(p^k) = p^k - p^(k-1)
+            (x, fac) ->
+                    // Take the current value of the accumulator and multiply it by the next phi
+                    // of a prime
+                   x * ((int)Math.pow(fac.prime, fac.exponent) -
+                           (int)Math.pow(fac.prime, fac.exponent - 1)),
+            // I don't understand why I need this third lambda, but its value doesn't seem to matter
+            // and not having some lambda here confuses java. Ergo, I just map to 1.
+            (x, y) -> 1);
+  }
+
+  /**
    * Basic error checking for factoring functions
    *
    * @param number Potential number to be factored
@@ -169,7 +229,7 @@ public class Util {
     if(number == 0) {
       throw new IllegalArgumentException("Zero has an infinite number of factors");
     } else if (number < 0) {
-      throw new IllegalArgumentException("Could not factor a negative number");
+      throw new IllegalArgumentException("Cannot factor a negative number");
     }
   }
 
