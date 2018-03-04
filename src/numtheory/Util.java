@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * Various number theory utilities. Including, but not limited to,
@@ -55,7 +58,7 @@ public class Util {
   }
 
   /**
-   * Returns an array of all the {@code from}<sup>th</sup> - {@code to}<sup>th</sup> primes/
+   * Returns an array of all the {@code from}<sup>th</sup> - {@code to}<sup>th</sup> primes.
    * Note that this array is a copy.
    *
    * @param from Where to start returning prime numbers (e.g. 2 is the first, 3 is the second, etc)
@@ -117,17 +120,7 @@ public class Util {
    * @throws IllegalArgumentException if given zero or a negative number to factor
    */
   public static Set<Integer> factorNoRepeats(int number) {
-    factorCheck(number);
-
-    Set<Integer> ans = new HashSet<>();
-
-    for(int i = 0; i < primes.length && number != 1; ++i) {
-      if(number % primes[i] == 0) {
-        ans.add(primes[i]);
-        number /= primes[i];
-      }
-    }
-    return ans;
+    return factor(number).stream().map((fac) -> fac.prime).collect(Collectors.toSet());
   }
 
   /**
@@ -183,6 +176,8 @@ public class Util {
    *
    * @param number Number to calculate the radical of
    * @return Radical of the given number
+   * @throws IllegalStateException If prime sieve is not big enough
+   * @throws IllegalArgumentException If given 0 or a negative number
    */
   public static int radical(int number) {
     // muh java 8
@@ -195,6 +190,8 @@ public class Util {
    *
    * @param number Number to calculate totient of
    * @return phi(number)
+   * @throws IllegalStateException If prime sieve is not big enough
+   * @throws IllegalArgumentException If given 0 or a negative number
    */
   public static int phi(int number) {
     if(number == 1) {
@@ -202,20 +199,86 @@ public class Util {
     }
 
     return factor(number).stream().reduce(1,
-            // Basically a fold operation, uses fact that phi(mn) = phi(m)phi(n) if GCD(m,n) = 1,
+            // Basically a fold op, uses fact that phi(mn) = phi(m)phi(n) if GCD(m,n) = 1,
             // and that phi(p^k) = p^k - p^(k-1)
-            (x, fac) ->
+            (acc, fact) ->
                     // Take the current value of the accumulator and multiply it by the next phi
                     // of a prime
-                   x * ((int)Math.pow(fac.prime, fac.exponent) -
-                           (int)Math.pow(fac.prime, fac.exponent - 1)),
+                   acc * (fact.expPrime() - fact.expPrime() / fact.prime),
             // I don't understand why I need this third lambda, but its value doesn't seem to matter
             // and not having some lambda here confuses java. Ergo, I just map to 1.
             (x, y) -> 1);
   }
 
   /**
-   * Basic error checking for factoring functions
+   * Uses the Euclidean algorithm to determine the greatest common divisor of two numbers.
+   * The greatest common divisor of two numbers is the largest number that divides both numbers.
+   *
+   * @param num1 First number
+   * @param num2 Second number
+   * @return The largest number that divides both arguments
+   */
+  public static int gcd(int num1, int num2) {
+    if(num1 < num2) {
+      int temp = num1;
+      num1 = num2;
+      num2 = temp;
+    }
+
+    // Euclidean algorithm
+    int currRem = num2;
+    while(num1 % num2 != 0) {
+      currRem = num1 % num2;
+      num1 = num2;
+      num2 = currRem;
+    }
+    return currRem;
+  }
+
+  /**
+   * Returns a set that forms a reduced residue system modulo a given number.
+   * More simply, it returns all numbers that are both smaller and relatively prime
+   * to the given number.
+   *
+   * @param num Modulus for the reduced residue system
+   * @return Set of numbers that form a reduced residue system
+   */
+  public static SortedSet<Integer> getReducedResidueSystem(int num) {
+    SortedSet<Integer> ans = new TreeSet<>();
+    for(int i = 1; i < num; ++i) {
+      if(Util.gcd(num, i) == 1) {
+        ans.add(i);
+      }
+    }
+    return ans;
+  }
+
+
+  /**
+   * Calculates the divisor function of a given number.
+   * That is, the sum of all d &lt; n that divide n, including n.
+   *
+   * @param number Number to calculate sigma of
+   * @return sigma(number)
+   */
+  public static int sigma(int number) {
+    if(number == 1) {
+      return 1;
+    }
+
+    return factor(number).stream().reduce(1,
+            // Uses the fact that sigma(mn) = sigma(m)sigma(n) when GCD(m,n) = 1,
+            // and that sigma(p^k) = (p^(k+1) - 1) / (p - 1)
+            (acc, fact) ->
+                    // Take the current value of the accumulator and multiply it by the next sigma
+                    // of a prime
+                    acc * (fact.expPrime() * fact.prime - 1) / (fact.prime - 1),
+            // Same as in phi(), not sure why it be like it is, but it do
+            (x, y) -> 1);
+  }
+
+  /**
+   * Basic error checking for factoring functions.
    *
    * @param number Potential number to be factored
    * @throws IllegalArgumentException If the number is 0 or negative
@@ -237,8 +300,8 @@ public class Util {
    * Represents a factor of some number, which is some prime and the number of times it is a factor.
    */
   public static class Factor {
-    final int prime;
-    final int exponent;
+    public final int prime;
+    public final int exponent;
 
     /**
      * Create a factor with a given prime value and exponent.
@@ -249,6 +312,15 @@ public class Util {
     Factor(int prime, int exponent) {
       this.prime = prime;
       this.exponent = exponent;
+    }
+
+    /**
+     * Exponents the prime held by this {@code Factor} by the exponent held.
+     *
+     * @return prime<sup>exponent</sup>
+     */
+    int expPrime() {
+      return (int)Math.pow(prime, exponent);
     }
 
     @Override

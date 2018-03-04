@@ -1,6 +1,6 @@
 package abst.group;
 
-import java.util.Set;
+import java.util.SortedSet;
 
 public class Coset<E> {
   private boolean isSubgroup;
@@ -10,7 +10,7 @@ public class Coset<E> {
 
   }
 
-  public Set<E> getElements() {
+  public SortedSet<E> getElements() {
     return null;
   }
 }

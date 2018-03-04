@@ -1,10 +1,10 @@
 package function.binary;
 
-import function.BinaryFunc;
+import java.util.function.BinaryOperator;
 
-public class XPlusY implements BinaryFunc<Double, Double, Double> {
+public class XPlusY implements BinaryOperator<Double> {
   @Override
-  public Double apply(Double arg1, Double arg2) {
-    return arg1 + arg2;
+  public Double apply(Double left, Double right) {
+    return left + right;
   }
 }

@@ -1,7 +1,6 @@
 package abst.group;
 
-import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * Represents the mathematical object called a group.
@@ -15,12 +14,12 @@ import java.util.Set;
  *   <li><i>H</i> and/or <i>K</i> will be used to refer to some subgroup of <i>G</i>.</li>
  *   <li><i>h, k</i>, possibly indexed, will be used to refer to elements of H and K.</li>
  * </ul>
- * <p>A group is defined as a nonempty set endowed with a binary operation, such that <ul>
+ * <p>A group is defined as a nonempty set endowed with a binary op, such that <ul>
  *   <li>Multiplying any element by any other element results in an element of the group</li>
  *   <li>There exists an element called the identity, e, such that for any element a
  *       <p><i>a * e = e * a = a.</i></li>
  *   <li>Every element <i>a</i> has a unique inverse
- *       <i>a-1</i> such that <i>a * a<sup>-1</sup>= a<sup>-1</sup> * a = e.</i></li>
+ *       <i>a<sup>-1</sup></i> such that <i>a * a<sup>-1</sup>= a<sup>-1</sup> * a = e.</i></li>
  * </ul>
  *
  * @param <E> The type of the elements in this {@code Group}
@@ -37,8 +36,9 @@ public interface Group<E> {
   Group extProduct(Group other);
 
   /**
-   * A conjugate of <i>g<sub><sub>1</sub></sub></i> by <i>g<sub><sub>2</sub></sub></i> is defined as
-   * <i>g<sub><sub>1</sub></sub> * g<sub><sub>2</sub></sub> * g<sub>1</sub><sup>-1</sup></i>.
+   * A conjugate of <i>g</i><sub><sub>1</sub></sub> by <i>g</i><sub><sub>2</sub></sub> is defined as
+   * <i>g</i><sub><sub>1</sub></sub> * <i>g</i><sub><sub>2</sub></sub>
+   * * <i>g</i><sub><sub>1</sub></sub><sup>-1</sup>
    *
    * @param elem Element to conjugate
    * @param conjugateBy Element to conjugate by
@@ -69,21 +69,28 @@ public interface Group<E> {
    * @param subGroup Subgroup to generate cosets from
    * @return A set of all cosets of the subgroup
    */
-  Set<Coset<E>> cosets(Group<E> subGroup);
+  SortedSet<Coset<E>> cosets(Group<E> subGroup);
+
+  /**
+   * Returns the identity element of <i>G</i>.
+   *
+   * @return The identity element of <i>G</i>
+   */
+  E getIdentity();
 
   /**
    * Returns the elements of <i>G</i>.
    *
    * @return Set containing the elements of <i>G</i>
    */
-  Set<E> getElements();
+  SortedSet<E> getElements();
 
   /**
-   * Applies <i>G</i>'s binary operation to two elements.
+   * Applies <i>G</i>'s binary op to two elements.
    *
-   * @param elem1 Element on the left hand side of the operation
-   * @param elem2 Element on the right hand side of the operation
-   * @return Result of the operation
+   * @param elem1 Element on the left hand side of the op
+   * @param elem2 Element on the right hand side of the op
+   * @return Result of the op
    */
   E operation(E elem1, E elem2);
 

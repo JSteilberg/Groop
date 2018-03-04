@@ -5,6 +5,18 @@ import java.util.function.BinaryOperator;
 
 import numtheory.Util;
 
+/**
+ * Implements the method of successive squaring for congruences.
+ * <p>The method of successive squaring is a technique for calculating extremely large
+ * exponents modulo some m. It works by breaking down the exponent into powers of two,
+ * computing the base to those powers of two by repetition, and multiplying the result together.
+ * <p>Example - 7<sup>11</sup> mod 17:<br>
+ * 7<sup>1</sup> = 7<br>
+ * 7<sup>2</sup> = (7<sup>1</sup>)<sup>2</sup> = 15 = -2 (mod 17)<br>
+ * 7<sup>4</sup> = (7<sup>2</sup>)<sup>2</sup> = -2<sup>2</sup> = 4 (mod 17)<br>
+ * 2<sup>8</sup> = (7<sup>4</sup>)<sup>2</sup> = 4<sup>2</sup> = 16 = -1 (mod 17)<br>
+ * 7<sup>10</sup> = 7<sup>8 + 2 + 1</sup> = 7*-2*-1 = 14 (mod 17).<br>
+ */
 public class ExponentMod implements BinaryOperator<Integer> {
   private final int modulus;
   private final int phiModulus;
