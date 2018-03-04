@@ -2,21 +2,24 @@ package function;
 
 import org.junit.Test;
 
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
 import function.binary.XPlusY;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests instances of the {@link BinaryFunc} class.
+ * Tests from the function.binary package.
  */
 public class TestBinary {
 
   @Test
   public void testLamb() {
-    UnaryFunc<Double, Double> f = (x) -> (x * x);
-    BinaryFunc<Double, Double, Double> fex = (x, y) -> x + y;
-    BinaryFunc<Double, Double, Double> xPl = new XPlusY();
-    assertEquals("ree", new Double(10d), xPl.apply(7d, 3d));
-    assertEquals("ree", new Double(49), f.apply(7d));
+    Function<Double, Double> square = (x) -> (x * x);
+    BiFunction<Double, Double, Double> xplusy = new XPlusY();
+
+    assertEquals("ree", 10d, xplusy.apply(7d, 3d), .01);
+    assertEquals("ree", 49d, square.apply(7d), .01);
   }
 }
