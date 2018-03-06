@@ -5,10 +5,19 @@ import java.util.SortedSet;
 import java.util.function.BinaryOperator;
 
 /**
- * Represents
+ * Represents a group with integer elements. Common use cases are multiplicative and additive
+ * groups.
+ *
+ * TODO: Make specific subclasses for multiplicative and additive groups.
  */
 public class Zed extends FiniteGroup<Integer> {
 
+  /**
+   * Create a new integer group with given binary operation and elements.
+   *
+   * @param operation Operation between the integers
+   * @param elements Set of integers to operate upon
+   */
   public Zed(BinaryOperator<Integer> operation, SortedSet<Integer> elements) {
     super(operation, elements);
   }
@@ -28,14 +37,15 @@ public class Zed extends FiniteGroup<Integer> {
     return null;
   }
 
+  //TODO: This needs to be cleaned up.. a lot... I was just excited to have it working
   @Override
   public String cayleyTable() {
 
     int maxelem = this.elements.stream().max(Comparator.naturalOrder()).get();
-    int amtExtraSpace = (int)Math.log10(maxelem);
-    amtExtraSpace++;
+    int amtExtraSpace = (int) Math.log10(maxelem);
+    amtExtraSpace += 0;
     String sp = "";
-    for(int i = 0; i < amtExtraSpace; ++i) {
+    for (int i = 0; i < amtExtraSpace; ++i) {
       sp += " ";
     }
 
@@ -49,8 +59,10 @@ public class Zed extends FiniteGroup<Integer> {
         ans.append(sp).append(elem).append(" ");
       } else if (elem < 100) {
         ans.append(sp).append("\b").append(elem).append(" ");
-      } else {
+      } else if (elem < 1000) {
         ans.append(sp).append("\b\b").append(elem).append(" ");
+      } else {
+        ans.append(sp).append("\b\b\b").append(elem).append(" ");
       }
     }
 
@@ -61,25 +73,28 @@ public class Zed extends FiniteGroup<Integer> {
     }
 
 
-
     for (Integer i : this.elements) {
       if (i < 10) {
         ans.append("\n").append(sp).append(i).append(" \u2503");
-      } else if (i < 100){
+      } else if (i < 100) {
         ans.append("\n").append(sp).append("\b").append(i).append(" \u2503");
-       // ans += "\n" + i + " \u2503";
-      } else {
+      } else if (i < 1000) {
         ans.append("\n").append(sp).append("\b\b").append(i).append(" \u2503");
+      } else {
+        ans.append("\n").append(sp).append("\b\b\b").append(i).append(" \u2503");
       }
+
       for (Integer col : this.elements) {
         Integer prod = this.operation(i, col);
         if (prod < 10) {
           ans.append(sp).append(prod).append(" ");
         } else if (prod < 100) {
           ans.append(sp).append("\b").append(prod).append(" ");
-         // ans += prod + " ";
-        } else {
+          // ans += prod + " ";
+        } else if (prod < 1000) {
           ans.append(sp).append("\b\b").append(prod).append(" ");
+        } else {
+          ans.append(sp).append("\b\b\b").append(prod).append(" ");
         }
       }
     }
