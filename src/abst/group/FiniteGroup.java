@@ -15,11 +15,11 @@ import java.util.function.BinaryOperator;
  * @param <T> Type of element for the group
  */
 public abstract class FiniteGroup<T> implements Group<T> {
-  protected BinaryOperator<T> op;
+  private BinaryOperator<T> op;
   protected SortedSet<T> elements;
   protected GroupProps props;
-  T identity;
-  protected Map<T, T> inverses;
+  private T identity;
+  private Map<T, T> inverses;
 
   /**
    * Create a new {@code FiniteGroup} with a given operation and set of elements.
@@ -33,6 +33,7 @@ public abstract class FiniteGroup<T> implements Group<T> {
 
     this.props = new GroupProps();
     this.props.setFinite(true);
+    this.props.setOperator("\u00B7");
 
     this.elements = elements;
     this.op = operation;
@@ -175,6 +176,11 @@ public abstract class FiniteGroup<T> implements Group<T> {
       }
     }
     return possibIdentity;
+  }
+
+  @Override
+  public SortedSet<T> getElements() {
+    return this.elements;
   }
 
   @Override

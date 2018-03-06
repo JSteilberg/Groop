@@ -8,6 +8,7 @@ class GroupProps {
   private boolean isFinite;
   private boolean isAbelian;
   private int order;
+  private String operator;
 
   public GroupProps() {}
 
@@ -39,6 +40,15 @@ class GroupProps {
   public GroupProps setOrder(int value) {
     this.order = value;
     return this;
+  }
+
+  public GroupProps setOperator(String operator) {
+    this.operator = operator;
+    return this;
+  }
+
+  public String getOperator() {
+    return this.operator;
   }
 
   /**

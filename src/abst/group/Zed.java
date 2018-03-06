@@ -1,6 +1,7 @@
 package abst.group;
 
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.SortedSet;
 import java.util.function.BinaryOperator;
 
@@ -16,7 +17,7 @@ public class Zed extends FiniteGroup<Integer> {
    * Create a new integer group with given binary operation and elements.
    *
    * @param operation Operation between the integers
-   * @param elements Set of integers to operate upon
+   * @param elements  Set of integers to operate upon
    */
   public Zed(BinaryOperator<Integer> operation, SortedSet<Integer> elements) {
     super(operation, elements);
@@ -32,70 +33,83 @@ public class Zed extends FiniteGroup<Integer> {
     return 0;
   }
 
-  @Override
-  public SortedSet<Integer> getElements() {
-    return null;
-  }
-
   //TODO: This needs to be cleaned up.. a lot... I was just excited to have it working
   @Override
   public String cayleyTable() {
 
-    int maxelem = this.elements.stream().max(Comparator.naturalOrder()).get();
-    int amtExtraSpace = (int) Math.log10(maxelem);
-    amtExtraSpace += 0;
-    String sp = "";
-    for (int i = 0; i < amtExtraSpace; ++i) {
-      sp += " ";
+    // Java is just so pretty, isn't it...
+    Optional<Integer> maxelemp = this.elements.stream().max(Comparator.naturalOrder());
+
+    int maxelem;
+    if (maxelemp.isPresent()) {
+      maxelem = maxelemp.get();
+    } else {
+      throw new InvalidGroupException("Group seems to have no max element");
+    }
+    if (maxelem == 0) {
+      maxelem = 1;
     }
 
-    StringBuilder ans = new StringBuilder("\n" + sp + "+ \u2503");
+    // Floor of log base 10 is the number of digits in a number
+    int amtExSpace = (int) Math.log10(maxelem) + 1;
+    String sp = "                  ";
+    //amtExSpace += 2;
+
+    // Put down the operator
+    StringBuilder ans =
+            new StringBuilder(sp.substring(1, amtExSpace) +
+                    this.props.getOperator() + " \u2503");
+
     int rowLength = 0;
 
     // Create key at top of table
     for (Integer elem : this.elements) {
-      rowLength += (amtExtraSpace + 2);
-      if (elem < 10) {
-        ans.append(sp).append(elem).append(" ");
-      } else if (elem < 100) {
-        ans.append(sp).append("\b").append(elem).append(" ");
-      } else if (elem < 1000) {
-        ans.append(sp).append("\b\b").append(elem).append(" ");
+      rowLength += (amtExSpace + 1);
+      int elemLen;
+      if (elem < 1) {
+        elemLen = 1;
       } else {
-        ans.append(sp).append("\b\b\b").append(elem).append(" ");
+        elemLen = (int) Math.log10(elem) + 1;
       }
+
+      ans.append(sp.substring(elemLen, amtExSpace + 1)).append(elem);
     }
 
-    // Create line before listing elements of group
-    ans.append("\n").append(sp).append("\u2501\u2501\u254B");
+
+    // Create horizontal line before listing elements of group
+    ans.append("\n");
+    for (int i = 0; i <= amtExSpace; ++i) {
+      ans.append("\u2501");
+    }
+    ans.append("\u254B");
     for (int i = 0; i < rowLength; ++i) {
       ans.append("\u2501");
     }
 
 
-    for (Integer i : this.elements) {
-      if (i < 10) {
-        ans.append("\n").append(sp).append(i).append(" \u2503");
-      } else if (i < 100) {
-        ans.append("\n").append(sp).append("\b").append(i).append(" \u2503");
-      } else if (i < 1000) {
-        ans.append("\n").append(sp).append("\b\b").append(i).append(" \u2503");
+    for (Integer row : this.elements) {
+      int elemLen;
+      if (row < 1) {
+        elemLen = 1;
       } else {
-        ans.append("\n").append(sp).append("\b\b\b").append(i).append(" \u2503");
+        elemLen = (int) Math.log10(row) + 1;
       }
+      ans.append("\n").append(sp.substring(elemLen, amtExSpace)).append(row).append(" \u2503");
 
       for (Integer col : this.elements) {
-        Integer prod = this.operation(i, col);
-        if (prod < 10) {
-          ans.append(sp).append(prod).append(" ");
-        } else if (prod < 100) {
-          ans.append(sp).append("\b").append(prod).append(" ");
-          // ans += prod + " ";
-        } else if (prod < 1000) {
-          ans.append(sp).append("\b\b").append(prod).append(" ");
+        Integer prod = this.operation(row, col);
+
+        int colLen;
+        if (prod < 1) {
+          colLen = 1;
         } else {
-          ans.append(sp).append("\b\b\b").append(prod).append(" ");
+          colLen = (int) Math.log10(prod) + 1;
         }
+
+        if (colLen > amtExSpace) {
+          amtExSpace = colLen + 1;
+        }
+        ans.append(sp.substring(colLen, amtExSpace + 1)).append(prod);
       }
     }
     return ans.toString();
