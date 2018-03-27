@@ -33,7 +33,6 @@ public class Zed extends FiniteGroup<Integer> {
     return 0;
   }
 
-  //TODO: This needs to be cleaned up.. a lot... I was just excited to have it working
   @Override
   public String cayleyTable() {
 
@@ -87,6 +86,8 @@ public class Zed extends FiniteGroup<Integer> {
     }
 
 
+    // Loop through every row
+    int lastelem = 1;
     for (Integer row : this.elements) {
       int elemLen;
       if (row < 1) {
@@ -94,8 +95,16 @@ public class Zed extends FiniteGroup<Integer> {
       } else {
         elemLen = (int) Math.log10(row) + 1;
       }
+
+      for(int i = lastelem + 1; i < row; ++i) {
+        ans.append("\n").append(sp.substring(elemLen, amtExSpace)).append(i).append(" \u2503");
+      }
+      lastelem = row;
+
       ans.append("\n").append(sp.substring(elemLen, amtExSpace)).append(row).append(" \u2503");
 
+      // For each row, product it with each column, print the result
+      int lcol = 1;
       for (Integer col : this.elements) {
         Integer prod = this.operation(row, col);
 
@@ -109,6 +118,11 @@ public class Zed extends FiniteGroup<Integer> {
         if (colLen > amtExSpace) {
           amtExSpace = colLen + 1;
         }
+
+        for(int i = lcol + 1; i < col; ++i) {
+          ans.append(" ").append(0);
+        }
+        lcol = col;
         ans.append(sp.substring(colLen, amtExSpace + 1)).append(prod);
       }
     }

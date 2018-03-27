@@ -16,6 +16,7 @@ import java.util.function.BinaryOperator;
  */
 public abstract class FiniteGroup<T> implements Group<T> {
   private BinaryOperator<T> op;
+  private BinaryOperator<T> opInv;
   protected SortedSet<T> elements;
   protected GroupProps props;
   private T identity;
@@ -41,6 +42,8 @@ public abstract class FiniteGroup<T> implements Group<T> {
     this.identity = this.findIdentity();
     this.inverses = this.findInverses();
   }
+
+ // public FiniteGroup(BinaryOperator<T> operation)
 
   /**
    * Construct a group in a similar fashion to above, but without the need to search for the
